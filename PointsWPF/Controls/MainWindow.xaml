@@ -8,17 +8,14 @@
                       mc:Ignorable="d"
                       x:Class="PointsOnline.MainWindow"
                       WindowStartupLocation="CenterScreen"
-                      Title="PointsOnline"
+                      Title="Points Online"
                       TitleCaps="False"
                       WindowTransitionsEnabled="False"
                       BorderBrush="{DynamicResource AccentColorBrush}"
-                      ContentRendered="Window_Rendered">
-
-    <Window.Resources>
-
-    </Window.Resources>
-
-    <controls:MetroWindow.LeftWindowCommands>
+                      Initialized="MainWindow_OnInitialized"
+                      Loaded="MainWindow_OnLoadCommand">
+	
+    <!--<controls:MetroWindow.LeftWindowCommands>
         <controls:WindowCommands>
             <Button>
                 <Rectangle Width="22"
@@ -43,42 +40,16 @@
                 </Rectangle>
             </Button>
         </controls:WindowCommands>
-    </controls:MetroWindow.LeftWindowCommands>
+    </controls:MetroWindow.LeftWindowCommands>-->
 
-    <local:VignettePanel Background="White">
-            <local:ScrollBox>
-            <Canvas Width="2000"
-                    Height="2000"
-                    Background="Transparent"
-                    Loaded="Canvas_Loaded">
-                <local:PlanePoint Canvas.Left="0"
-                                  Canvas.Top="0" />
-                <local:PlanePoint Canvas.Left="500"
-                                  Canvas.Top="0" />
-                <local:PlanePoint Canvas.Left="0"
-                                  Canvas.Top="200" />
-                <local:PlanePoint Canvas.Left="500"
-                                  Canvas.Top="400" />
-                <Path Fill="#1F0FFAFF"
-                      Stroke="#1F000000"
-                      StrokeThickness="10"
-                      StrokeLineJoin="Round"
-                      Stretch="Fill">
-                    <Path.Data>
-                        <PathGeometry>
-                            <PathGeometry.Figures>
-                                <PathFigure StartPoint="0,0"
-                                            IsClosed="True">
-                                    <LineSegment Point="500,0" />
-                                    <LineSegment Point="500,400" />
-                                    <LineSegment Point="0,200" />
-                                </PathFigure>
-                            </PathGeometry.Figures>
-                        </PathGeometry>
-                    </Path.Data>
-                </Path>
-            </Canvas>
-            </local:ScrollBox>
+    <controls:MetroWindow.DataContext>
+        <local:MainWindowViewModel />
+    </controls:MetroWindow.DataContext>
+
+    <local:VignettePanel  Background="White">
+        <Grid x:Uid="gameStatePanel">
+			<!--<local:Splash />-->
+		</Grid>
     </local:VignettePanel>
 
 </controls:MetroWindow>

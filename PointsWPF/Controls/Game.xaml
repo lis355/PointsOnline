@@ -1,0 +1,53 @@
+﻿<UserControl x:Class="PointsOnline.Game"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="clr-namespace:PointsOnline"
+             xmlns:themes="clr-namespace:Microsoft.Windows.Themes;assembly=PresentationFramework.Aero"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
+             mc:Ignorable="d"
+             d:DesignHeight="300"
+			 d:DesignWidth="600"
+			 Loaded="Game_OnLoaded">
+    <UserControl.DataContext>
+        <local:GameViewMoldel />
+    </UserControl.DataContext>
+    <local:ScrollBox Background="Transparent">
+        <Grid Width="2000"
+              Height="2000">
+            <Canvas Uid="canvasWithPoints">
+                <local:PlanePoint Canvas.Left="0"
+                                  Canvas.Top="0" />
+                <local:PlanePoint Canvas.Left="500"
+                                  Canvas.Top="0" />
+                <local:PlanePoint Canvas.Left="0"
+                                  Canvas.Top="200" />
+                <local:PlanePoint Canvas.Left="500"
+                                  Canvas.Top="400" />
+
+            </Canvas>
+            <Canvas Uid="canvasWithRegions"
+                    IsHitTestVisible="False">
+                <Path Fill="#1F0FFAFF"
+                      Stroke="#1F000000"
+                      StrokeThickness="10"
+                      StrokeLineJoin="Round"
+                      Stretch="Fill">
+                    <Path.Data>
+                        <PathGeometry>
+                            <PathGeometry.Figures>
+                                <PathFigure StartPoint="0,0"
+                                            IsClosed="True">
+                                    <LineSegment Point="500,0" />
+                                    <LineSegment Point="500,400" />
+                                    <LineSegment Point="0,200" />
+                                </PathFigure>
+                            </PathGeometry.Figures>
+                        </PathGeometry>
+                    </Path.Data>
+                </Path>
+            </Canvas>
+        </Grid>
+    </local:ScrollBox>
+</UserControl>

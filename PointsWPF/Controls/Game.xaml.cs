@@ -1,36 +1,25 @@
 ﻿using System;
-using System.Diagnostics;
-using System.IO;
-using System.Net;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media.Animation;
-using System.Windows.Shapes;
 
 namespace PointsOnline
 {
-    public partial class MainWindow
+    public partial class Game 
     {
-        Canvas _canvas;
-
-        public MainWindow()
+        public Game()
         {
             InitializeComponent();
         }
 
-        private void Canvas_Loaded(object sender, RoutedEventArgs e)
+        Canvas _canvasWithPoints;
+        Canvas _canvasWithRegions;
+        
+        private void Game_OnLoaded(object sender, RoutedEventArgs e)
         {
-            _canvas = sender as Canvas;
-        }
-
-        private void Window_Rendered(object sender, EventArgs e)
-        {
-            // TMP
+            _canvasWithPoints = (Canvas)this.FindByUid("canvasWithPoints");
+            _canvasWithRegions = (Canvas)this.FindByUid("canvasWithRegions");
 
             LoadPoints();
-            SaveDataManager.Instance.Load();
         }
 
         private void LoadPoints()
@@ -45,7 +34,7 @@ namespace PointsOnline
                     var p = new PlanePoint();
                     Canvas.SetLeft(p, i * (diameter + offset));
                     Canvas.SetTop(p, j * (diameter + offset));
-                    _canvas.Children.Add(p);
+                    _canvasWithPoints.Children.Add(p);
                 }
             }
         }
