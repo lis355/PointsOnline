@@ -27,9 +27,9 @@ namespace PointsOnline
             int diameter = (int)(double)Application.Current.FindResource("ShapeDiameter");
             int offset = (int)(diameter / 2.0);
 
-            for (int i = 0; i < 11; ++i)
+            for (int i = 0; i < 5; ++i)
             {
-                for (int j = 0; j < 11; ++j)
+                for (int j = 0; j < 5; ++j)
                 {
                     var p = new PlanePoint();
                     Canvas.SetLeft(p, i * (diameter + offset));
