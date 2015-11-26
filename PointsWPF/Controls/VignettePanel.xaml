@@ -1,0 +1,55 @@
+﻿<UserControl x:Class="PointsOnline.VignettePanel"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:local="clr-namespace:PointsOnline"
+             mc:Ignorable="d"
+             d:DesignHeight="300"
+             d:DesignWidth="300">
+
+    <UserControl.Resources>
+
+        <RadialGradientBrush x:Key="OpacityBrush"
+                             RadiusX="8"
+                             RadiusY="8">
+            <GradientStop Offset="0"
+                          Color="Black"></GradientStop>
+            <GradientStop Offset="1"
+                          Color="Transparent"></GradientStop>
+        </RadialGradientBrush>
+
+        <ControlTemplate x:Key="StyleTemplate"
+                         TargetType="{x:Type local:VignettePanel}">
+            <Grid Background="Black">
+                <Grid Background="{TemplateBinding Background}"
+                      x:Name="G">
+                    <ContentPresenter ContentTemplate="{TemplateBinding ContentControl.ContentTemplate}"
+                                      Content="{TemplateBinding ContentControl.Content}"
+                                      ContentStringFormat="{TemplateBinding ContentControl.ContentStringFormat}"
+                                      HorizontalAlignment="{TemplateBinding ContentControl.HorizontalContentAlignment}"
+                                      Margin="{TemplateBinding ContentControl.Padding}"
+                                      RecognizesAccessKey="True"
+                                      SnapsToDevicePixels="{TemplateBinding ContentControl.SnapsToDevicePixels}"
+                                      VerticalAlignment="{TemplateBinding ContentControl.VerticalContentAlignment}" />
+                </Grid>
+            </Grid>
+            <ControlTemplate.Triggers>
+                <DataTrigger Binding="{Binding Path=HasVignette, RelativeSource={RelativeSource Self}}"
+                             Value="True">
+                    <Setter TargetName="G"
+                            Property="OpacityMask"
+                            Value="{StaticResource OpacityBrush}" />
+                </DataTrigger>
+            </ControlTemplate.Triggers>
+        </ControlTemplate>
+
+        <Style TargetType="{x:Type local:VignettePanel}">
+            <Setter Property="Template"
+                    Value="{StaticResource StyleTemplate}">
+            </Setter>
+        </Style>
+
+    </UserControl.Resources>
+
+</UserControl>

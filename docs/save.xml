@@ -1,0 +1,29 @@
+﻿<Game version="1.0" date="25.06.11" time="0:33">
+
+	<!--Перечисляем параметры игры-->
+	<Field type="limited" dimension="30" />
+	<Type mode="unlimited" />
+	<State condition="102" />
+	
+	<!--Цвет точек-->
+	<PointColor number="1" color="255;0;0" />
+	<PointColor number="2" color="0;0;255" />
+
+	<!--Сначала идет перечисление всех точек-->
+	<Point color="2" x="14" y="15" />
+	<Point color="1" x="15" y="15" />
+	<Point color="2" x="16" y="15" />
+	<Point color="1" x="14" y="16" />
+	<Point color="2" x="15" y="16" />
+	<Point color="1" x="16" y="16" />
+	<Point color="1" x="15" y="17" />
+
+	<!--После отрисовки точек рисуем регионы, точки указаны в последовательности прохождения границы области-->
+	<Region color="1">
+		<InnerPoint x="15" y="15" />
+		<InnerPoint x="14" y="16" />
+		<InnerPoint x="15" y="17" />
+		<InnerPoint x="16" y="16" />
+	</Region>
+
+</Game>
