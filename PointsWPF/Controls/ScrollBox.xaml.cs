@@ -34,17 +34,17 @@ namespace PointsOnline
 
         private ScrollViewer scrollOwner = null;
 
-        public static readonly DependencyProperty ContentScaleProperty =
-                DependencyProperty.Register("ContentScale", typeof(double), typeof(ScrollBox),
-                                            new FrameworkPropertyMetadata(1.0, ContentScale_PropertyChanged, ContentScale_Coerce));
+        public static readonly DependencyProperty ZoomProperty =
+                DependencyProperty.Register("Zoom", typeof(double), typeof(ScrollBox),
+                                            new FrameworkPropertyMetadata(1.0, Zoom_PropertyChanged, Zoom_Coerce));
 
-        public static readonly DependencyProperty MinContentScaleProperty =
-                DependencyProperty.Register("MinContentScale", typeof(double), typeof(ScrollBox),
-                                            new FrameworkPropertyMetadata(0.01, MinOrMaxContentScale_PropertyChanged));
+        public static readonly DependencyProperty MinimumZoomProperty =
+                DependencyProperty.Register("MinimumZoom", typeof(double), typeof(ScrollBox),
+                                            new FrameworkPropertyMetadata(0.01, MinOrMaximumZoom_PropertyChanged));
 
-        public static readonly DependencyProperty MaxContentScaleProperty =
-                DependencyProperty.Register("MaxContentScale", typeof(double), typeof(ScrollBox),
-                                            new FrameworkPropertyMetadata(10.0, MinOrMaxContentScale_PropertyChanged));
+        public static readonly DependencyProperty MaximumZoomProperty =
+                DependencyProperty.Register("MaximumZoom", typeof(double), typeof(ScrollBox),
+                                            new FrameworkPropertyMetadata(10.0, MinOrMaximumZoom_PropertyChanged));
 
         public static readonly DependencyProperty ContentOffsetXProperty =
                 DependencyProperty.Register("ContentOffsetX", typeof(double), typeof(ScrollBox),
@@ -127,41 +127,41 @@ namespace PointsOnline
             }
         }
 
-        public double ContentScale
+        public double Zoom
         {
             get
             {
-                return (double)GetValue(ContentScaleProperty);
+                return (double)GetValue(ZoomProperty);
             }
             set
             {
-                SetValue(ContentScaleProperty, value);
+                SetValue(ZoomProperty, value);
             }
         }
 
-        public event EventHandler ContentScaleChanged;
+        public event EventHandler ZoomChanged;
 
-        public double MinContentScale
+        public double MinimumZoom
         {
             get
             {
-                return (double)GetValue(MinContentScaleProperty);
+                return (double)GetValue(MinimumZoomProperty);
             }
             set
             {
-                SetValue(MinContentScaleProperty, value);
+                SetValue(MinimumZoomProperty, value);
             }
         }
 
-        public double MaxContentScale
+        public double MaximumZoom
         {
             get
             {
-                return (double)GetValue(MaxContentScaleProperty);
+                return (double)GetValue(MaximumZoomProperty);
             }
             set
             {
-                SetValue(MaxContentScaleProperty, value);
+                SetValue(MaximumZoomProperty, value);
             }
         }
 
@@ -275,7 +275,7 @@ namespace PointsOnline
         {
             double scaleX = ContentViewportWidth / contentRect.Width;
             double scaleY = ContentViewportHeight / contentRect.Height;
-            double newScale = ContentScale * Math.Min(scaleX, scaleY);
+            double newScale = Zoom * Math.Min(scaleX, scaleY);
 
             AnimatedZoomPointToViewportCenter(newScale, new Point(contentRect.X + (contentRect.Width / 2), contentRect.Y + (contentRect.Height / 2)), null);
         }
@@ -284,12 +284,12 @@ namespace PointsOnline
         {
             double scaleX = ContentViewportWidth / contentRect.Width;
             double scaleY = ContentViewportHeight / contentRect.Height;
-            double newScale = ContentScale * Math.Min(scaleX, scaleY);
+            double newScale = Zoom * Math.Min(scaleX, scaleY);
 
             ZoomPointToViewportCenter(newScale, new Point(contentRect.X + (contentRect.Width / 2), contentRect.Y + (contentRect.Height / 2)));
         }
 
-        public void SnapContentOffsetTo(Point contentOffset)
+        public void SnapContentOffsetTo(Vector contentOffset)
         {
             CancelAnimation(this, ContentOffsetXProperty);
             CancelAnimation(this, ContentOffsetYProperty);
@@ -316,9 +316,9 @@ namespace PointsOnline
             StartAnimation(this, ContentOffsetYProperty, newY, AnimationDuration);
         }
 
-        public void AnimatedZoomAboutPoint(double newContentScale, Point contentZoomFocus)
+        public void AnimatedZoomAboutPoint(double newZoom, Point contentZoomFocus)
         {
-            newContentScale = Math.Min(Math.Max(newContentScale, MinContentScale), MaxContentScale);
+            newZoom = Math.Min(Math.Max(newZoom, MinimumZoom), MaximumZoom);
 
             CancelAnimation(this, ContentZoomFocusXProperty);
             CancelAnimation(this, ContentZoomFocusYProperty);
@@ -327,15 +327,15 @@ namespace PointsOnline
 
             ContentZoomFocusX = contentZoomFocus.X;
             ContentZoomFocusY = contentZoomFocus.Y;
-            ViewportZoomFocusX = (ContentZoomFocusX - ContentOffsetX) * ContentScale;
-            ViewportZoomFocusY = (ContentZoomFocusY - ContentOffsetY) * ContentScale;
+            ViewportZoomFocusX = (ContentZoomFocusX - ContentOffsetX) * Zoom;
+            ViewportZoomFocusY = (ContentZoomFocusY - ContentOffsetY) * Zoom;
 
             enableContentOffsetUpdateFromScale = true;
 
             disableScrollOffsetSync = true;
             disableContentFocusSync = true;
 
-            StartAnimation(this, ContentScaleProperty, newContentScale, AnimationDuration,
+            StartAnimation(this, ZoomProperty, newZoom, AnimationDuration,
                 (sender, e) =>
                 {
                     enableContentOffsetUpdateFromScale = false;
@@ -347,22 +347,22 @@ namespace PointsOnline
                 });
         }
 
-        public void ZoomAboutPoint(double newContentScale, Point contentZoomFocus)
+        public void ZoomAboutPoint(double newZoom, Point contentZoomFocus)
         {
-            newContentScale = Math.Min(Math.Max(newContentScale, MinContentScale), MaxContentScale);
+            newZoom = Math.Min(Math.Max(newZoom, MinimumZoom), MaximumZoom);
 
-            double screenSpaceZoomOffsetX = (contentZoomFocus.X - ContentOffsetX) * ContentScale;
-            double screenSpaceZoomOffsetY = (contentZoomFocus.Y - ContentOffsetY) * ContentScale;
-            double contentSpaceZoomOffsetX = screenSpaceZoomOffsetX / newContentScale;
-            double contentSpaceZoomOffsetY = screenSpaceZoomOffsetY / newContentScale;
+            double screenSpaceZoomOffsetX = (contentZoomFocus.X - ContentOffsetX) * Zoom;
+            double screenSpaceZoomOffsetY = (contentZoomFocus.Y - ContentOffsetY) * Zoom;
+            double contentSpaceZoomOffsetX = screenSpaceZoomOffsetX / newZoom;
+            double contentSpaceZoomOffsetY = screenSpaceZoomOffsetY / newZoom;
             double newContentOffsetX = contentZoomFocus.X - contentSpaceZoomOffsetX;
             double newContentOffsetY = contentZoomFocus.Y - contentSpaceZoomOffsetY;
 
-            CancelAnimation(this, ContentScaleProperty);
+            CancelAnimation(this, ZoomProperty);
             CancelAnimation(this, ContentOffsetXProperty);
             CancelAnimation(this, ContentOffsetYProperty);
 
-            ContentScale = newContentScale;
+            Zoom = newZoom;
             ContentOffsetX = newContentOffsetX;
             ContentOffsetY = newContentOffsetY;
         }
@@ -406,7 +406,7 @@ namespace PointsOnline
             content = Template.FindName("ScrollData", this) as FrameworkElement;
             if (content != null)
             {
-                contentScaleTransform = new ScaleTransform(ContentScale, ContentScale);
+                contentScaleTransform = new ScaleTransform(Zoom, Zoom);
 
                 contentOffsetTransform = new TranslateTransform();
                 UpdateTranslationX();
@@ -419,9 +419,9 @@ namespace PointsOnline
             }
         }
 
-        private void AnimatedZoomPointToViewportCenter(double newContentScale, Point contentZoomFocus, EventHandler callback)
+        private void AnimatedZoomPointToViewportCenter(double newZoom, Point contentZoomFocus, EventHandler callback)
         {
-            newContentScale = Math.Min(Math.Max(newContentScale, MinContentScale), MaxContentScale);
+            newZoom = Math.Min(Math.Max(newZoom, MinimumZoom), MaximumZoom);
 
             CancelAnimation(this, ContentZoomFocusXProperty);
             CancelAnimation(this, ContentZoomFocusYProperty);
@@ -430,15 +430,15 @@ namespace PointsOnline
 
             ContentZoomFocusX = contentZoomFocus.X;
             ContentZoomFocusY = contentZoomFocus.Y;
-            ViewportZoomFocusX = (ContentZoomFocusX - ContentOffsetX) * ContentScale;
-            ViewportZoomFocusY = (ContentZoomFocusY - ContentOffsetY) * ContentScale;
+            ViewportZoomFocusX = (ContentZoomFocusX - ContentOffsetX) * Zoom;
+            ViewportZoomFocusY = (ContentZoomFocusY - ContentOffsetY) * Zoom;
 
             //
-            // When zooming about a point make updates to ContentScale also update content offset.
+            // When zooming about a point make updates to Zoom also update content offset.
             //
             enableContentOffsetUpdateFromScale = true;
 
-            StartAnimation(this, ContentScaleProperty, newContentScale, AnimationDuration,
+            StartAnimation(this, ZoomProperty, newZoom, AnimationDuration,
                 delegate (object sender, EventArgs e)
                 {
                     enableContentOffsetUpdateFromScale = false;
@@ -453,30 +453,30 @@ namespace PointsOnline
             StartAnimation(this, ViewportZoomFocusYProperty, ViewportHeight / 2, AnimationDuration);
         }
 
-        private void ZoomPointToViewportCenter(double newContentScale, Point contentZoomFocus)
+        private void ZoomPointToViewportCenter(double newZoom, Point contentZoomFocus)
         {
-            newContentScale = Math.Min(Math.Max(newContentScale, MinContentScale), MaxContentScale);
+            newZoom = Math.Min(Math.Max(newZoom, MinimumZoom), MaximumZoom);
 
-            CancelAnimation(this, ContentScaleProperty);
+            CancelAnimation(this, ZoomProperty);
             CancelAnimation(this, ContentOffsetXProperty);
             CancelAnimation(this, ContentOffsetYProperty);
 
-            ContentScale = newContentScale;
+            Zoom = newZoom;
             ContentOffsetX = contentZoomFocus.X - (ContentViewportWidth / 2);
             ContentOffsetY = contentZoomFocus.Y - (ContentViewportHeight / 2);
         }
 
-        private static void ContentScale_PropertyChanged(DependencyObject o, DependencyPropertyChangedEventArgs e)
+        private static void Zoom_PropertyChanged(DependencyObject o, DependencyPropertyChangedEventArgs e)
         {
             ScrollBox c = (ScrollBox)o;
 
             if (c.contentScaleTransform != null)
             {
                 //
-                // Update the content scale transform whenever 'ContentScale' changes.
+                // Update the content scale transform whenever 'Zoom' changes.
                 //
-                c.contentScaleTransform.ScaleX = c.ContentScale;
-                c.contentScaleTransform.ScaleY = c.ContentScale;
+                c.contentScaleTransform.ScaleX = c.Zoom;
+                c.contentScaleTransform.ScaleY = c.Zoom;
             }
 
             //
@@ -502,8 +502,8 @@ namespace PointsOnline
                     //
                     double viewportOffsetX = c.ViewportZoomFocusX - (c.ViewportWidth / 2);
                     double viewportOffsetY = c.ViewportZoomFocusY - (c.ViewportHeight / 2);
-                    double contentOffsetX = viewportOffsetX / c.ContentScale;
-                    double contentOffsetY = viewportOffsetY / c.ContentScale;
+                    double contentOffsetX = viewportOffsetX / c.Zoom;
+                    double contentOffsetY = viewportOffsetY / c.Zoom;
                     c.ContentOffsetX = (c.ContentZoomFocusX - (c.ContentViewportWidth / 2)) - contentOffsetX;
                     c.ContentOffsetY = (c.ContentZoomFocusY - (c.ContentViewportHeight / 2)) - contentOffsetY;
                 }
@@ -513,9 +513,9 @@ namespace PointsOnline
                 }
             }
 
-            if (c.ContentScaleChanged != null)
+            if (c.ZoomChanged != null)
             {
-                c.ContentScaleChanged(c, EventArgs.Empty);
+                c.ZoomChanged(c, EventArgs.Empty);
             }
 
             if (c.scrollOwner != null)
@@ -524,18 +524,18 @@ namespace PointsOnline
             }
         }
 
-        private static object ContentScale_Coerce(DependencyObject d, object baseValue)
+        private static object Zoom_Coerce(DependencyObject d, object baseValue)
         {
             ScrollBox c = (ScrollBox)d;
             double value = (double)baseValue;
-            value = Math.Min(Math.Max(value, c.MinContentScale), c.MaxContentScale);
+            value = Math.Min(Math.Max(value, c.MinimumZoom), c.MaximumZoom);
             return value;
         }
 
-        private static void MinOrMaxContentScale_PropertyChanged(DependencyObject o, DependencyPropertyChangedEventArgs e)
+        private static void MinOrMaximumZoom_PropertyChanged(DependencyObject o, DependencyPropertyChangedEventArgs e)
         {
             ScrollBox c = (ScrollBox)o;
-            c.ContentScale = Math.Min(Math.Max(c.ContentScale, c.MinContentScale), c.MaxContentScale);
+            c.Zoom = Math.Min(Math.Max(c.Zoom, c.MinimumZoom), c.MaximumZoom);
         }
 
         private static void ContentOffsetX_PropertyChanged(DependencyObject o, DependencyPropertyChangedEventArgs e)
@@ -675,8 +675,8 @@ namespace PointsOnline
 
         private void UpdateContentViewportSize()
         {
-            ContentViewportWidth = ViewportWidth / ContentScale;
-            ContentViewportHeight = ViewportHeight / ContentScale;
+            ContentViewportWidth = ViewportWidth / Zoom;
+            ContentViewportHeight = ViewportHeight / Zoom;
 
             constrainedContentViewportWidth = Math.Min(ContentViewportWidth, unScaledExtent.Width);
             constrainedContentViewportHeight = Math.Min(ContentViewportHeight, unScaledExtent.Height);
@@ -689,7 +689,7 @@ namespace PointsOnline
         {
             if (contentOffsetTransform != null)
             {
-                double scaledContentWidth = unScaledExtent.Width * ContentScale;
+                double scaledContentWidth = unScaledExtent.Width * Zoom;
                 if (scaledContentWidth < ViewportWidth)
                 {
                     //
@@ -708,7 +708,7 @@ namespace PointsOnline
         {
             if (contentOffsetTransform != null)
             {
-                double scaledContentHeight = unScaledExtent.Height * ContentScale;
+                double scaledContentHeight = unScaledExtent.Height * Zoom;
                 if (scaledContentHeight < ViewportHeight)
                 {
                     //
@@ -837,7 +837,7 @@ namespace PointsOnline
         {
             get
             {
-                return unScaledExtent.Width * ContentScale;
+                return unScaledExtent.Width * Zoom;
             }
         }
 
@@ -845,7 +845,7 @@ namespace PointsOnline
         {
             get
             {
-                return unScaledExtent.Height * ContentScale;
+                return unScaledExtent.Height * Zoom;
             }
         }
 
@@ -881,7 +881,7 @@ namespace PointsOnline
         {
             get
             {
-                return ContentOffsetX * ContentScale;
+                return ContentOffsetX * Zoom;
             }
         }
 
@@ -889,7 +889,7 @@ namespace PointsOnline
         {
             get
             {
-                return ContentOffsetY * ContentScale;
+                return ContentOffsetY * Zoom;
             }
         }
 
@@ -904,7 +904,7 @@ namespace PointsOnline
             {
                 disableScrollOffsetSync = true;
 
-                ContentOffsetX = offset / ContentScale;
+                ContentOffsetX = offset / Zoom;
             }
             finally
             {
@@ -923,7 +923,7 @@ namespace PointsOnline
             {
                 disableScrollOffsetSync = true;
 
-                ContentOffsetY = offset / ContentScale;
+                ContentOffsetY = offset / Zoom;
             }
             finally
             {
@@ -1044,7 +1044,7 @@ namespace PointsOnline
                         vertOffset = transformedRect.Bottom - viewportRect.Bottom;
                     }
 
-                    SnapContentOffsetTo(new Point(ContentOffsetX + horizOffset, ContentOffsetY + vertOffset));
+                    SnapContentOffsetTo(new Vector(ContentOffsetX + horizOffset, ContentOffsetY + vertOffset));
                 }
             }
             return rectangle;
@@ -1229,13 +1229,13 @@ namespace PointsOnline
         private void ZoomOut(Point contentZoomCenter)
         {
             double zoomVal = 0.5;
-            AnimatedZoomAboutPoint(ContentScale - zoomVal, contentZoomCenter);
+            AnimatedZoomAboutPoint(Zoom - zoomVal, contentZoomCenter);
         }
         
         private void ZoomIn(Point contentZoomCenter)
         {
             double zoomVal = 0.5;
-            AnimatedZoomAboutPoint(ContentScale + zoomVal, contentZoomCenter);
+            AnimatedZoomAboutPoint(Zoom + zoomVal, contentZoomCenter);
         }
     }
 }

@@ -86,6 +86,7 @@
     <Compile Include="Controls\VignettePanel.xaml.cs">
       <DependentUpon>VignettePanel.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Logic\IntPoint.cs" />
     <Compile Include="ViewModels\MainWindowViewModel.cs" />
   </ItemGroup>
   <ItemGroup>

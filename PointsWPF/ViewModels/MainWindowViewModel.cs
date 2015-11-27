@@ -53,6 +53,16 @@ namespace PointsOnline
 
         void OnLoad(object parameter)
         {
+            //LoadSplash();
+
+            // DEBUG
+            View.GameStatePanel.Children.Add(new Game());
+        }
+
+        #endregion
+        
+        void LoadSplash()
+        {
             var first = new Splash();
             View.GameStatePanel.Children.Add(first);
             first.SplashWorkedOutDelegate = () =>
@@ -62,8 +72,6 @@ namespace PointsOnline
             };
         }
 
-        #endregion
-        
         void CrossFadeGameState( UIElement first, UIElement second )
         {
             const double durationInSeconds = 1;

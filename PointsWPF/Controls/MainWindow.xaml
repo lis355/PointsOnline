@@ -48,8 +48,7 @@
 
     <local:VignettePanel  Background="White">
         <Grid x:Uid="gameStatePanel">
-			<!--<local:Splash />-->
-		</Grid>
+        </Grid>
     </local:VignettePanel>
 
 </controls:MetroWindow>

@@ -3,7 +3,13 @@
                     xmlns:local="clr-namespace:PointsOnline"
                     xmlns:sys="clr-namespace:System;assembly=mscorlib">
 
-	<sys:Double x:Key="ShapeDiameter">60</sys:Double>
-    <sys:Double x:Key="ShapeNegativeHalfDiameter">-30</sys:Double>
-
+	<sys:Double x:Key="ShapeDiameter">24</sys:Double>
+    <sys:Double x:Key="ShapeNegativeHalfDiameter">-12</sys:Double>
+    <sys:Double x:Key="ShapeOffset">6</sys:Double>
+    <Rect x:Key="FieldGridRect"
+		  X="9"
+		  Y="9"
+		  Width="30"
+          Height="30" />
+    
 </ResourceDictionary>

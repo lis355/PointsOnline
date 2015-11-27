@@ -10,44 +10,86 @@
              d:DesignHeight="300"
 			 d:DesignWidth="600"
 			 Loaded="Game_OnLoaded">
+
+    <UserControl.Resources>
+
+        <SolidColorBrush x:Key="RedTeamPointBrush">#FFFF3434</SolidColorBrush>
+        <SolidColorBrush x:Key="RedTeamRegionBrush">#80FF3434</SolidColorBrush>
+        <SolidColorBrush x:Key="BlueTeamPointBrush">#FF34A4FF</SolidColorBrush>
+        <SolidColorBrush x:Key="BlueTeamRegionBrush">#8034A4FF</SolidColorBrush>
+        <SolidColorBrush x:Key="BackgroundPointBrush">#20000000</SolidColorBrush>
+
+    </UserControl.Resources>
+
     <UserControl.DataContext>
         <local:GameViewMoldel />
     </UserControl.DataContext>
-    <local:ScrollBox Background="Transparent">
+	
+    <local:ScrollBox x:Name="scroll"  Background="Transparent">
         <Grid Width="2000"
               Height="2000">
+            <Grid Uid="canvasWithGrid" Opacity="0">
+                <Grid.Background>
+                    <DrawingBrush Viewport="{StaticResource FieldGridRect}"
+                                  ViewportUnits="Absolute"
+                                  TileMode="Tile">
+                        <DrawingBrush.Drawing>
+                            <DrawingGroup>
+                                <DrawingGroup.Children>
+                                    <GeometryDrawing Geometry="M0,0 L50,0">
+                                        <GeometryDrawing.Pen>
+                                            <Pen Thickness="2"
+                                                 Brush="{StaticResource BackgroundPointBrush}" />
+                                        </GeometryDrawing.Pen>
+                                    </GeometryDrawing>
+                                    <GeometryDrawing Geometry="M0,0 L0,50">
+                                        <GeometryDrawing.Pen>
+                                            <Pen Thickness="2"
+                                                 Brush="{StaticResource BackgroundPointBrush}" />
+                                        </GeometryDrawing.Pen>
+                                    </GeometryDrawing>
+                                </DrawingGroup.Children>
+                            </DrawingGroup>
+                        </DrawingBrush.Drawing>
+                    </DrawingBrush>
+                </Grid.Background>
+                <Grid.Triggers>
+                    <EventTrigger RoutedEvent="MouseMove">
+                        <EventTrigger.Actions>
+                            <BeginStoryboard>
+                                <Storyboard>
+                                    <DoubleAnimation Duration="0:0:0.1"
+                                                     Storyboard.TargetProperty="Opacity"
+                                                     To="1">
+                                        <!--<DoubleAnimation.EasingFunction>
+                                            <SineEase EasingMode="EaseOut"></SineEase>
+                                        </DoubleAnimation.EasingFunction>-->
+                                    </DoubleAnimation>
+                                    <DoubleAnimation Duration="0:0:1"
+                                                     BeginTime="0:0:0.1"
+                                                     Storyboard.TargetProperty="Opacity"
+                                                     To="1" />
+                                    <DoubleAnimation Duration="0:0:0.5"
+                                                     BeginTime="0:0:1.1"
+                                                     Storyboard.TargetProperty="Opacity"
+                                                     To="0" />
+                                </Storyboard>
+                            </BeginStoryboard>
+                        </EventTrigger.Actions>
+                    </EventTrigger>
+                </Grid.Triggers>
+            </Grid>
             <Canvas Uid="canvasWithPoints">
-                <local:PlanePoint Canvas.Left="0"
-                                  Canvas.Top="0" />
-                <local:PlanePoint Canvas.Left="500"
-                                  Canvas.Top="0" />
-                <local:PlanePoint Canvas.Left="0"
-                                  Canvas.Top="200" />
-                <local:PlanePoint Canvas.Left="500"
-                                  Canvas.Top="400" />
-
+                <!--<local:PlanePoint Canvas.Left="0"
+                                  Canvas.Top="0" />-->
             </Canvas>
             <Canvas Uid="canvasWithRegions"
                     IsHitTestVisible="False">
-                <Path Fill="#1F0FFAFF"
-                      Stroke="#1F000000"
-                      StrokeThickness="10"
-                      StrokeLineJoin="Round"
-                      Stretch="Fill">
-                    <Path.Data>
-                        <PathGeometry>
-                            <PathGeometry.Figures>
-                                <PathFigure StartPoint="0,0"
-                                            IsClosed="True">
-                                    <LineSegment Point="500,0" />
-                                    <LineSegment Point="500,400" />
-                                    <LineSegment Point="0,200" />
-                                </PathFigure>
-                            </PathGeometry.Figures>
-                        </PathGeometry>
-                    </Path.Data>
-                </Path>
             </Canvas>
+            <Border BorderBrush="#FF80ba45"
+                    BorderThickness="5"
+                    HorizontalAlignment="Stretch"
+                    VerticalAlignment="Stretch" />
         </Grid>
     </local:ScrollBox>
 </UserControl>
