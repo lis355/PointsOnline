@@ -19,15 +19,33 @@
         <SolidColorBrush x:Key="BlueTeamRegionBrush">#8034A4FF</SolidColorBrush>
         <SolidColorBrush x:Key="BackgroundPointBrush">#20000000</SolidColorBrush>
 
+        <Storyboard x:Key="GridShowStoryboard">
+            <DoubleAnimation Duration="0:0:0.1"
+                             Storyboard.TargetProperty="Opacity"
+                             To="1">
+            </DoubleAnimation>
+            <DoubleAnimation Duration="0:0:1"
+                             BeginTime="0:0:0.1"
+                             Storyboard.TargetProperty="Opacity"
+                             To="1" />
+            <DoubleAnimation Duration="0:0:0.5"
+                             BeginTime="0:0:1.1"
+                             Storyboard.TargetProperty="Opacity"
+                             To="0" />
+        </Storyboard>
+
     </UserControl.Resources>
 
     <UserControl.DataContext>
         <local:GameViewMoldel />
     </UserControl.DataContext>
-	
-    <local:ScrollBox x:Name="scroll"  Background="Transparent">
-        <Grid Width="2000"
-              Height="2000">
+
+    <local:ScrollBox x:Name="scroll"
+                     Background="Transparent"
+                     MouseMove="ScrollBox_MouseMove"
+                     Dragged="ScrollBox_Dragged">
+        <Grid Width="2100"
+              Height="2100">
             <Grid Uid="canvasWithGrid" Opacity="0">
                 <Grid.Background>
                     <DrawingBrush Viewport="{StaticResource FieldGridRect}"
@@ -36,13 +54,13 @@
                         <DrawingBrush.Drawing>
                             <DrawingGroup>
                                 <DrawingGroup.Children>
-                                    <GeometryDrawing Geometry="M0,0 L50,0">
+                                    <GeometryDrawing Geometry="M0,0 L30,0">
                                         <GeometryDrawing.Pen>
                                             <Pen Thickness="2"
                                                  Brush="{StaticResource BackgroundPointBrush}" />
                                         </GeometryDrawing.Pen>
                                     </GeometryDrawing>
-                                    <GeometryDrawing Geometry="M0,0 L0,50">
+                                    <GeometryDrawing Geometry="M0,0 L0,30">
                                         <GeometryDrawing.Pen>
                                             <Pen Thickness="2"
                                                  Brush="{StaticResource BackgroundPointBrush}" />
@@ -53,31 +71,15 @@
                         </DrawingBrush.Drawing>
                     </DrawingBrush>
                 </Grid.Background>
-                <Grid.Triggers>
+                <!--<Grid.Triggers>
                     <EventTrigger RoutedEvent="MouseMove">
                         <EventTrigger.Actions>
                             <BeginStoryboard>
-                                <Storyboard>
-                                    <DoubleAnimation Duration="0:0:0.1"
-                                                     Storyboard.TargetProperty="Opacity"
-                                                     To="1">
-                                        <!--<DoubleAnimation.EasingFunction>
-                                            <SineEase EasingMode="EaseOut"></SineEase>
-                                        </DoubleAnimation.EasingFunction>-->
-                                    </DoubleAnimation>
-                                    <DoubleAnimation Duration="0:0:1"
-                                                     BeginTime="0:0:0.1"
-                                                     Storyboard.TargetProperty="Opacity"
-                                                     To="1" />
-                                    <DoubleAnimation Duration="0:0:0.5"
-                                                     BeginTime="0:0:1.1"
-                                                     Storyboard.TargetProperty="Opacity"
-                                                     To="0" />
-                                </Storyboard>
+                                
                             </BeginStoryboard>
                         </EventTrigger.Actions>
                     </EventTrigger>
-                </Grid.Triggers>
+                </Grid.Triggers>-->
             </Grid>
             <Canvas Uid="canvasWithPoints">
                 <!--<local:PlanePoint Canvas.Left="0"

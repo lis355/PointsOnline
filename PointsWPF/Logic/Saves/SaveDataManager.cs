@@ -4,16 +4,9 @@ using GJson;
 
 namespace PointsOnline
 {
-    [Name("SaveData")]
-    public class SaveData
-    {
-        [Name("data")]
-        public string test = "543gfdgd";
-    }
-
     class SaveDataManager<T>
     {
-        protected SaveDataManager()
+        public SaveDataManager()
         {
         }
 
@@ -47,19 +40,9 @@ namespace PointsOnline
             var dataString = dataJson.ToStringIdent();
             json["h"] = Utils.GetMd5( dataString );
             json["data"] = dataJson;
-            dataString = json.ToStringIdent();
+            var saveDataString = json.ToStringIdent();
 
-            File.WriteAllText(SaveFilePath, dataString);
-        }
-    }
-
-    class SaveDataManager : SaveDataManager<SaveData>
-    {
-        public static SaveDataManager<SaveData> Instance { get; private set; }
-
-        static SaveDataManager()
-        {
-            Instance = new SaveDataManager();
+            File.WriteAllText(SaveFilePath, saveDataString);
         }
     }
 }

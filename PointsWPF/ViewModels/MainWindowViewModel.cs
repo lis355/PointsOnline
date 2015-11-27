@@ -33,8 +33,7 @@ namespace PointsOnline
         {
             View = parameter as MainWindow;
 
-            //SaveDataManager.Instance.Save( new SaveData() );
-            //SaveDataManager.Instance.Load();
+            PointsSaveDataManager.Instance.Initialize();
         }
 
         ICommand _onLoadCommand;
@@ -53,10 +52,10 @@ namespace PointsOnline
 
         void OnLoad(object parameter)
         {
-            //LoadSplash();
+            LoadSplash();
 
             // DEBUG
-            View.GameStatePanel.Children.Add(new Game());
+            //View.GameStatePanel.Children.Add(new Game());
         }
 
         #endregion

@@ -86,6 +86,15 @@ namespace PointsOnline
                 DependencyProperty.Register("IsMouseWheelScrollingEnabled", typeof(bool), typeof(ScrollBox),
                                             new FrameworkPropertyMetadata(false));
 
+        public static readonly RoutedEvent DraggedEvent = EventManager.RegisterRoutedEvent("Dragged", RoutingStrategy.Bubble,
+                typeof(RoutedEventHandler), typeof(ScrollBox));
+
+        public event RoutedEventHandler Dragged
+        {
+            add { AddHandler(DraggedEvent, value); }
+            remove { RemoveHandler(DraggedEvent, value); }
+        }
+
         public double ContentOffsetX
         {
             get
@@ -1197,8 +1206,10 @@ namespace PointsOnline
                 ContentOffsetX -= dragOffset.X;
                 ContentOffsetY -= dragOffset.Y;
 
-               // Debug.Print(ContentOffsetX.ToString() + "   " +dragOffset.X.ToString()
-               //     + "   " + contentOffsetTransform.X.ToString());
+                RaiseEvent(new RoutedEventArgs(DraggedEvent));
+
+                // Debug.Print(ContentOffsetX.ToString() + "   " +dragOffset.X.ToString()
+                //     + "   " + contentOffsetTransform.X.ToString());
             }
 
             if (mouseHandlingMode != MouseHandlingMode.None)

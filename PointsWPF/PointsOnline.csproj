@@ -86,12 +86,14 @@
     <Compile Include="Controls\VignettePanel.xaml.cs">
       <DependentUpon>VignettePanel.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Logic\Saves\GameSaveData.cs" />
     <Compile Include="Logic\IntPoint.cs" />
+    <Compile Include="Logic\Saves\PointsSaveDataManager.cs" />
     <Compile Include="ViewModels\MainWindowViewModel.cs" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ViewModels\GameViewMoldel.cs" />
-    <Compile Include="Logic\SaveDataManager.cs" />
+    <Compile Include="Logic\Saves\SaveDataManager.cs" />
     <Compile Include="Logic\Utils.cs" />
     <Compile Include="Controls\MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
