@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -13,26 +14,48 @@ namespace PointsOnline
         public Game()
         {
             InitializeComponent();
+
+            _layers = new List<Canvas>();
         }
 
-        Canvas _canvasWithPoints;
-        Canvas _canvasWithRegions;
-        Grid _canvasWithGrid;
         Vector _coffset;
         double _pointRadius;
         double _pointOffset;
 
+        enum ELayers
+        {
+            Grid = 0,
+            GrayPoints,
+            CapturedAndBorderPoints,
+            Regions,
+            ActivePoints
+        }
+
+        List<Canvas> _layers;
+
+        private Canvas GetLayer(ELayers l)
+        {
+            return _layers[(int)l];
+        }
+
+        private void Game_Initialized(object sender, EventArgs e)
+        {
+        }
+
         private void Game_OnLoaded(object sender, RoutedEventArgs e)
         {
-            _canvasWithPoints = (Canvas)this.FindByUid("canvasWithPoints");
-            _canvasWithRegions = (Canvas)this.FindByUid("canvasWithRegions");
-            _canvasWithGrid = (Grid)this.FindByUid("canvasWithGrid");
+            //_canvasWithPoints = (Canvas)this.FindByUid("canvasWithPoints");
+            //_canvasWithRegions = (Canvas)this.FindByUid("canvasWithRegions");
+            //_canvasWithGrid = (Grid)this.FindByUid("canvasWithGrid");
 
             _pointRadius = (double)Application.Current.FindResource("ShapeDiameter") / 2.0;
             _pointOffset = (double)Application.Current.FindResource("ShapeOffset");
 
-            _coffset.X = _canvasWithPoints.ActualWidth / 2;
-            _coffset.Y = _canvasWithPoints.ActualHeight / 2;
+            InitializeLayers();
+            SetupLayers();
+
+            _coffset.X = GetLayer(ELayers.ActivePoints).ActualWidth / 2;
+            _coffset.Y = GetLayer(ELayers.ActivePoints).ActualHeight / 2;
 
             //PointsSaveDataManager.Instance.Data.RedPlayer.ActivePoints.AddRange(
             //new[]
@@ -81,51 +104,71 @@ namespace PointsOnline
             //    new IntPoint(-1, 0),
             //    new IntPoint(0, 1)
             //}));
-            
+
             var data = PointsSaveDataManager.Instance.Data;
 
-            LoadRedPoints(data.RedPlayer.ActivePoints);
-            LoadRedPoints(data.RedPlayer.CapturedPoints);
+            LoadRedPoints(data.RedPlayer.ActivePoints, GetLayer(ELayers.ActivePoints));
+            LoadRedPoints(data.RedPlayer.CapturedPoints, GetLayer(ELayers.CapturedAndBorderPoints));
             LoadRedRegions(data.RedPlayer.Regions);
-            LoadBluePoints(data.BluePlayer.ActivePoints);
-            LoadBluePoints(data.BluePlayer.CapturedPoints);
+            LoadBluePoints(data.BluePlayer.ActivePoints, GetLayer(ELayers.ActivePoints));
+            LoadBluePoints(data.BluePlayer.CapturedPoints, GetLayer(ELayers.CapturedAndBorderPoints));
             LoadBlueRegions(data.BluePlayer.Regions);
 
             ScrollToCenter();
         }
 
+        private void InitializeLayers()
+        {
+            var rootGrid = (Grid)this.FindByUid("layersContainerGrid");
+
+            foreach (var l in Enum.GetValues(typeof(ELayers)))
+            {
+                Canvas c = new Canvas();
+                rootGrid.Children.Add(c);
+                _layers.Add(c);
+            }
+
+            UpdateLayout();
+        }
+
+        private void SetupLayers()
+        {
+            GetLayer(ELayers.Grid).Background = (Brush)FindResource("GridBackgroundDrawingBrush");
+            GetLayer(ELayers.Grid).IsHitTestVisible = false;
+        }
+
         private void ScrollToCenter()
         {
             var offset = new Vector(
-                (_canvasWithPoints.ActualWidth - scroll.ActualWidth) / 2.0,
-                (_canvasWithPoints.ActualHeight - scroll.ActualHeight) / 2.0);
+                (GetLayer(ELayers.ActivePoints).ActualWidth - scroll.ActualWidth) / 2.0,
+                (GetLayer(ELayers.ActivePoints).ActualHeight - scroll.ActualHeight) / 2.0);
 
             scroll.SnapContentOffsetTo(offset);
         }
 
-        private void LoadRedPoints(IEnumerable<IntPoint> points)
+        private void LoadRedPoints(IEnumerable<IntPoint> points, Canvas layer)
         {
-            LoadPoints(points, (SolidColorBrush)FindResource("RedTeamPointBrush"));
+            LoadPoints(points, layer, (SolidColorBrush)FindResource("RedTeamPointBrush"));
         }
 
-        private void LoadBluePoints(IEnumerable<IntPoint> points)
+        private void LoadBluePoints(IEnumerable<IntPoint> points, Canvas layer)
         {
-            LoadPoints(points, (SolidColorBrush)FindResource("BlueTeamPointBrush"));
+            LoadPoints(points, layer, (SolidColorBrush)FindResource("BlueTeamPointBrush"));
         }
 
-        private void LoadPoints(IEnumerable<IntPoint> points, Brush fillBrush)
+        private void LoadPoints(IEnumerable<IntPoint> points, Canvas layer, Brush fillBrush)
         {
             Path p = new Path();
             p.Fill = fillBrush;
 
-            _canvasWithPoints.Children.Add(p);
+            layer.Children.Add(p);
 
             GeometryGroup g = new GeometryGroup();
             p.Data = g;
 
             foreach (var pt in points)
             {
-                EllipseGeometry e = new EllipseGeometry(GetPointCanvasCoordinatesFromIndex(pt.X, pt.Y),
+                EllipseGeometry e = new EllipseGeometry(GetPointCanvasCoordinatesFromIndex(pt),
                     _pointRadius, _pointRadius);
                 g.Children.Add(e);
             }
@@ -161,7 +204,7 @@ namespace PointsOnline
             p.StrokeThickness = _pointOffset;
             p.StrokeLineJoin = PenLineJoin.Round;
 
-            _canvasWithRegions.Children.Add(p);
+            GetLayer(ELayers.Regions).Children.Add(p);
 
             var pg = new PathGeometry();
             p.Data = pg;
@@ -177,26 +220,44 @@ namespace PointsOnline
             {
                 if (!isFirst)
                 {
-                    pf.StartPoint = GetPointCanvasCoordinatesFromIndex(pt.X, pt.Y);
+                    pf.StartPoint = GetPointCanvasCoordinatesFromIndex(pt);
                     isFirst = true;
                 }
                 else
                 {
-                    pf.Segments.Add(new LineSegment(GetPointCanvasCoordinatesFromIndex(pt.X,pt.Y), true));
+                    pf.Segments.Add(new LineSegment(GetPointCanvasCoordinatesFromIndex(pt), true));
                 }
             }
         }
 
-        private Point GetPointCanvasCoordinatesFromIndex(int i, int j)
+        private Point GetPointCanvasCoordinatesFromIndex(IntPoint p)
         {
             return new Point(
-                _coffset.X + i * (2 * _pointRadius + _pointOffset),
-                _coffset.Y + j * (2 * _pointRadius + _pointOffset));
+                _coffset.X + p.X * (2 * _pointRadius + _pointOffset),
+                _coffset.Y + p.Y * (2 * _pointRadius + _pointOffset));
+        }
+
+        private IntPoint GetPointIndexFromCanvasCoordinates(Point p)
+        {
+            return new IntPoint(
+                (int)((p.X - _coffset.X) / (2 * _pointRadius + _pointOffset)),
+                (int)((p.Y - _coffset.Y) / (2 * _pointRadius + _pointOffset)));
         }
 
         private void ScrollBox_MouseMove(object sender, MouseEventArgs e)
         {
             ShowGrid();
+
+            var indexes = GetPointIndexFromCanvasCoordinates(e.GetPosition(GetLayer(ELayers.ActivePoints)));
+            var centerCoord = GetPointCanvasCoordinatesFromIndex(indexes);
+            var shape = GetLayer(ELayers.GrayPoints).InputHitTest(centerCoord);
+            if (shape == null)
+            {
+                var p = new PlanePoint();
+                Canvas.SetLeft(p, centerCoord.X);
+                Canvas.SetTop(p, centerCoord.Y);
+                GetLayer(ELayers.GrayPoints).Children.Add(p);
+            }
         }
 
         private void ScrollBox_Dragged(object sender, RoutedEventArgs e)
@@ -207,7 +268,7 @@ namespace PointsOnline
         private void ShowGrid()
         {
             var sb = (Storyboard)FindResource("GridShowStoryboard");
-            Storyboard.SetTarget(sb, _canvasWithGrid);
+            Storyboard.SetTarget(sb, GetLayer(ELayers.Grid));
             sb.Begin();
         }
     }

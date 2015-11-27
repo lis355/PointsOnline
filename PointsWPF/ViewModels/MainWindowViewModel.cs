@@ -52,13 +52,14 @@ namespace PointsOnline
 
         void OnLoad(object parameter)
         {
+#if !DEVELOP
             LoadSplash();
-
-            // DEBUG
-            //View.GameStatePanel.Children.Add(new Game());
+#else
+            View.GameStatePanel.Children.Add(new Game());
+#endif
         }
 
-        #endregion
+#endregion
         
         void LoadSplash()
         {

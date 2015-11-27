@@ -10,7 +10,17 @@ namespace PointsOnline
         {
         }
 
-        private string SaveFilePath { get { return Application.UserAppDataPath + "\\save.json"; } }
+        private string SaveFilePath
+        {
+            get
+            {
+#if !DEVELOP
+                return Application.UserAppDataPath + "\\save.json"; } }
+#else
+                return "save.json";
+            }
+        }
+#endif
 
         public T Load()
         {
