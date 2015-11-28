@@ -26,8 +26,8 @@ namespace PointsOnline
         {
             Grid = 0,
             GrayPoints,
-            CapturedAndBorderPoints,
-            Regions,
+            CapturedPoints,
+            RegionAndBorders,
             ActivePoints
         }
 
@@ -44,10 +44,6 @@ namespace PointsOnline
 
         private void Game_OnLoaded(object sender, RoutedEventArgs e)
         {
-            //_canvasWithPoints = (Canvas)this.FindByUid("canvasWithPoints");
-            //_canvasWithRegions = (Canvas)this.FindByUid("canvasWithRegions");
-            //_canvasWithGrid = (Grid)this.FindByUid("canvasWithGrid");
-
             _pointRadius = (double)Application.Current.FindResource("ShapeDiameter") / 2.0;
             _pointOffset = (double)Application.Current.FindResource("ShapeOffset");
 
@@ -57,62 +53,7 @@ namespace PointsOnline
             _coffset.X = GetLayer(ELayers.ActivePoints).ActualWidth / 2;
             _coffset.Y = GetLayer(ELayers.ActivePoints).ActualHeight / 2;
 
-            //PointsSaveDataManager.Instance.Data.RedPlayer.ActivePoints.AddRange(
-            //new[]
-            //{
-            //    new IntPoint(0, 0),
-            //    new IntPoint(1, 0),
-            //    new IntPoint(1, 1)
-            //});
-            //
-            //PointsSaveDataManager.Instance.Data.RedPlayer.CapturedPoints.AddRange(
-            //new[]
-            //{
-            //    new IntPoint(0, 2)
-            //});
-            //
-            //PointsSaveDataManager.Instance.Data.RedPlayer.Regions.Add( new GameSaveData.Region(
-            //new[]
-            //{
-            //    new IntPoint(0, 0),
-            //    new IntPoint(1, 0),
-            //    new IntPoint(1, 1)
-            //}));
-            //
-            //PointsSaveDataManager.Instance.Data.BluePlayer.ActivePoints.AddRange(
-            //new[]
-            //{
-            //    new IntPoint(1, 2),
-            //    new IntPoint(1, 3),
-            //    new IntPoint(0, 3),
-            //    new IntPoint(-1, 3),
-            //    new IntPoint(-1, 2),
-            //    new IntPoint(-1, 1),
-            //    new IntPoint(-1, 0),
-            //    new IntPoint(0, 1)
-            //});
-            //
-            //PointsSaveDataManager.Instance.Data.BluePlayer.Regions.Add(new GameSaveData.Region(
-            //new[]
-            //{
-            //    new IntPoint(1, 2),
-            //    new IntPoint(1, 3),
-            //    new IntPoint(0, 3),
-            //    new IntPoint(-1, 3),
-            //    new IntPoint(-1, 2),
-            //    new IntPoint(-1, 1),
-            //    new IntPoint(-1, 0),
-            //    new IntPoint(0, 1)
-            //}));
-
-            var data = PointsSaveDataManager.Instance.Data;
-
-            LoadRedPoints(data.RedPlayer.ActivePoints, GetLayer(ELayers.ActivePoints));
-            LoadRedPoints(data.RedPlayer.CapturedPoints, GetLayer(ELayers.CapturedAndBorderPoints));
-            LoadRedRegions(data.RedPlayer.Regions);
-            LoadBluePoints(data.BluePlayer.ActivePoints, GetLayer(ELayers.ActivePoints));
-            LoadBluePoints(data.BluePlayer.CapturedPoints, GetLayer(ELayers.CapturedAndBorderPoints));
-            LoadBlueRegions(data.BluePlayer.Regions);
+            LoadFieldFromSave();
 
             ScrollToCenter();
         }
@@ -129,6 +70,18 @@ namespace PointsOnline
             }
 
             UpdateLayout();
+        }
+
+        private void LoadFieldFromSave()
+        {
+            var data = PointsSaveDataManager.Instance.Data;
+
+            LoadRedPoints(data.RedPlayer.ActivePoints, GetLayer(ELayers.ActivePoints));
+            LoadRedPoints(data.RedPlayer.CapturedPoints, GetLayer(ELayers.CapturedPoints));
+            LoadRedRegions(data.RedPlayer.Regions);
+            LoadBluePoints(data.BluePlayer.ActivePoints, GetLayer(ELayers.ActivePoints));
+            LoadBluePoints(data.BluePlayer.CapturedPoints, GetLayer(ELayers.CapturedPoints));
+            LoadBlueRegions(data.BluePlayer.Regions);
         }
 
         private void SetupLayers()
@@ -174,7 +127,7 @@ namespace PointsOnline
             }
         }
 
-        private void LoadRedRegions(IEnumerable<GameSaveData.Region> regions)
+        private void LoadRedRegions(IEnumerable<Region> regions)
         {
             var rb = (SolidColorBrush)FindResource("RedTeamRegionBrush");
             var pb = (SolidColorBrush)FindResource("RedTeamPointBrush");
@@ -182,10 +135,11 @@ namespace PointsOnline
             foreach (var r in regions)
             {
                 LoadRegion(r.Border, rb, pb);
+                LoadRedPoints(r.Points, GetLayer(ELayers.RegionAndBorders));
             }
         }
 
-        private void LoadBlueRegions(IEnumerable<GameSaveData.Region> regions)
+        private void LoadBlueRegions(IEnumerable<Region> regions)
         {
             var rb = (SolidColorBrush)FindResource("BlueTeamRegionBrush");
             var pb = (SolidColorBrush)FindResource("BlueTeamPointBrush");
@@ -193,6 +147,7 @@ namespace PointsOnline
             foreach (var r in regions)
             {
                 LoadRegion(r.Border, rb, pb);
+                LoadBluePoints(r.Points, GetLayer(ELayers.RegionAndBorders));
             }
         }
 
@@ -204,7 +159,7 @@ namespace PointsOnline
             p.StrokeThickness = _pointOffset;
             p.StrokeLineJoin = PenLineJoin.Round;
 
-            GetLayer(ELayers.Regions).Children.Add(p);
+            GetLayer(ELayers.RegionAndBorders).Children.Add(p);
 
             var pg = new PathGeometry();
             p.Data = pg;
@@ -228,6 +183,16 @@ namespace PointsOnline
                     pf.Segments.Add(new LineSegment(GetPointCanvasCoordinatesFromIndex(pt), true));
                 }
             }
+            
+            p.MouseEnter += (s, e) =>
+            {
+                StartFadeAnimation(p, 0.2, 0.3);
+            };
+
+            p.MouseLeave += (s, e) =>
+            {
+                StartFadeAnimation(p, 0.2, 1);
+            };
         }
 
         private Point GetPointCanvasCoordinatesFromIndex(IntPoint p)
@@ -239,24 +204,55 @@ namespace PointsOnline
 
         private IntPoint GetPointIndexFromCanvasCoordinates(Point p)
         {
-            return new IntPoint(
-                (int)((p.X - _coffset.X) / (2 * _pointRadius + _pointOffset)),
-                (int)((p.Y - _coffset.Y) / (2 * _pointRadius + _pointOffset)));
+            var r = new IntPoint();
+            double f = 2 * _pointRadius + _pointOffset;
+
+            if (p.X > _coffset.X)
+            {
+                r.X = (int)(0.5 + (p.X - _coffset.X) / f);
+            }
+            else
+            {
+                r.X = (int)(-0.5 + (p.X - _coffset.X) / f);
+            }
+
+            if (p.Y > _coffset.Y)
+            {
+                r.Y = (int)(0.5 + (p.Y - _coffset.Y) / f);
+            }
+            else
+            {
+                r.Y = (int)(-0.5 + (p.Y - _coffset.Y) / f);
+            }
+
+            return r;
         }
 
         private void ScrollBox_MouseMove(object sender, MouseEventArgs e)
         {
             ShowGrid();
 
-            var indexes = GetPointIndexFromCanvasCoordinates(e.GetPosition(GetLayer(ELayers.ActivePoints)));
+            var cpos = e.GetPosition(GetLayer(ELayers.ActivePoints));
+            var indexes = GetPointIndexFromCanvasCoordinates(cpos);
             var centerCoord = GetPointCanvasCoordinatesFromIndex(indexes);
-            var shape = GetLayer(ELayers.GrayPoints).InputHitTest(centerCoord);
-            if (shape == null)
+
+            UIElement shape = null;
+
+            // сделаем проверку на попадание в радиус т.к. indexes - координаты квадрата
+            if (_pointRadius >= Math.Sqrt((cpos.X - centerCoord.X) * (cpos.X - centerCoord.X)
+                + (cpos.Y - centerCoord.Y) * (cpos.Y - centerCoord.Y)))
             {
-                var p = new PlanePoint();
-                Canvas.SetLeft(p, centerCoord.X);
-                Canvas.SetTop(p, centerCoord.Y);
-                GetLayer(ELayers.GrayPoints).Children.Add(p);
+                shape = GetLayer(ELayers.GrayPoints).InputHitTest(centerCoord) as UIElement;
+                if (shape == null)
+                {
+                    // TEMP
+                    shape = new PlanePoint();
+                    Canvas.SetLeft(shape, centerCoord.X);
+                    Canvas.SetTop(shape, centerCoord.Y);
+                    GetLayer(ELayers.GrayPoints).Children.Add(shape);
+                }
+
+                StartFadeOutWaitFadeInAnimation(shape, 0.1, 1, 0.5);
             }
         }
 
@@ -267,9 +263,54 @@ namespace PointsOnline
 
         private void ShowGrid()
         {
-            var sb = (Storyboard)FindResource("GridShowStoryboard");
-            Storyboard.SetTarget(sb, GetLayer(ELayers.Grid));
-            sb.Begin();
+            StartFadeOutWaitFadeInAnimation(GetLayer(ELayers.Grid), 0.5, 1, 0.5);
+        }
+        
+        private void StartFadeOutWaitFadeInAnimation(UIElement element, double outTime, double waitTime, double inTime)
+        {
+            var storyboard = new Storyboard();
+
+            var animation = new DoubleAnimation();
+            storyboard.Children.Add(animation);
+            animation.To = 1;
+            animation.Duration = TimeSpan.FromSeconds(outTime);
+
+            animation = new DoubleAnimation();
+            storyboard.Children.Add(animation);
+            animation.To = 1;
+            animation.Duration = TimeSpan.FromSeconds(waitTime);
+            animation.BeginTime = TimeSpan.FromSeconds(outTime);
+
+            animation = new DoubleAnimation();
+            storyboard.Children.Add(animation);
+            animation.To = 0;
+            animation.Duration = TimeSpan.FromSeconds(inTime);
+            animation.BeginTime = TimeSpan.FromSeconds(outTime + waitTime);
+
+            Storyboard.SetTarget(storyboard, element);
+            Storyboard.SetTargetProperty(storyboard, new PropertyPath(OpacityProperty));
+
+            //storyboard.FillBehavior = FillBehavior.HoldEnd;
+            //storyboard.Completed += (s, e) =>
+            //{
+            //    storyboard.Remove();
+            //};
+
+            storyboard.Begin();
+        }
+
+        private void StartFadeAnimation(UIElement element, double time, double value)
+        {
+            var storyboard = new Storyboard();
+
+            var animation = new DoubleAnimation();
+            storyboard.Children.Add(animation);
+            animation.To = value;
+            animation.Duration = TimeSpan.FromSeconds(time);
+
+            Storyboard.SetTarget(storyboard, element);
+            Storyboard.SetTargetProperty(storyboard, new PropertyPath(OpacityProperty));
+            storyboard.Begin();
         }
     }
 }

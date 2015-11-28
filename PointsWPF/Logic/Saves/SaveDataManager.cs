@@ -6,21 +6,24 @@ namespace PointsOnline
 {
     class SaveDataManager<T>
     {
+        bool _isDebug;
+
         public SaveDataManager()
         {
+#if DEVELOP
+            _isDebug = true;
+#else
+            _isDebug = false;
+#endif
         }
 
         private string SaveFilePath
         {
             get
             {
-#if !DEVELOP
-                return Application.UserAppDataPath + "\\save.json"; } }
-#else
-                return "save.json";
+                return (_isDebug) ? "save.json" : Application.UserAppDataPath + "\\save.json";
             }
         }
-#endif
 
         public T Load()
         {
@@ -34,7 +37,8 @@ namespace PointsOnline
                 string md5 = json["h"];
                 var dataMd5 = Utils.GetMd5(jsonData.ToStringIdent());
 
-                if (md5 == dataMd5)
+                if (_isDebug
+                    || md5 == dataMd5)
                 {
                     data = Serializator.TryDeserialize<T>(jsonData);
                 }

@@ -89,6 +89,7 @@
     <Compile Include="Logic\Saves\GameSaveData.cs" />
     <Compile Include="Logic\IntPoint.cs" />
     <Compile Include="Logic\Saves\PointsSaveDataManager.cs" />
+    <Compile Include="Logic\Saves\Region.cs" />
     <Compile Include="ViewModels\MainWindowViewModel.cs" />
   </ItemGroup>
   <ItemGroup>

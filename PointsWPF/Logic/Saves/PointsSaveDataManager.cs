@@ -65,14 +65,14 @@ namespace PointsOnline
             Data.BluePlayer.Score = 0;
             Data.BluePlayer.ActivePoints = new List<IntPoint>();
             Data.BluePlayer.CapturedPoints = new List<IntPoint>();
-            Data.BluePlayer.Regions = new List<GameSaveData.Region>();
+            Data.BluePlayer.Regions = new List<Region>();
 
             Data.RedPlayer = new GameSaveData.PlayerStats();
             Data.RedPlayer.TimeInSeconds = 0;
             Data.RedPlayer.Score = 0;
             Data.RedPlayer.ActivePoints = new List<IntPoint>();
             Data.RedPlayer.CapturedPoints = new List<IntPoint>();
-            Data.RedPlayer.Regions = new List<GameSaveData.Region>();
+            Data.RedPlayer.Regions = new List<Region>();
         }
     }
 }

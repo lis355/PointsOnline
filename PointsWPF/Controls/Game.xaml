@@ -20,21 +20,6 @@
         <SolidColorBrush x:Key="BlueTeamRegionBrush">#8034A4FF</SolidColorBrush>
         <SolidColorBrush x:Key="BackgroundPointBrush">#20000000</SolidColorBrush>
 
-        <Storyboard x:Key="GridShowStoryboard">
-            <DoubleAnimation Duration="0:0:0.1"
-                             Storyboard.TargetProperty="Opacity"
-                             To="1">
-            </DoubleAnimation>
-            <DoubleAnimation Duration="0:0:1"
-                             BeginTime="0:0:0.1"
-                             Storyboard.TargetProperty="Opacity"
-                             To="1" />
-            <DoubleAnimation Duration="0:0:0.5"
-                             BeginTime="0:0:1.1"
-                             Storyboard.TargetProperty="Opacity"
-                             To="0" />
-        </Storyboard>
-
         <DrawingBrush x:Key="GridBackgroundDrawingBrush" 
 					  Viewport="{StaticResource FieldGridRect}"
                       ViewportUnits="Absolute"

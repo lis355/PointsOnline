@@ -10,15 +10,7 @@
 			[
 				{
 					"X" : 0,
-					"Y" : 0
-				},
-				{
-					"X" : 1,
-					"Y" : 0
-				},
-				{
-					"X" : 1,
-					"Y" : 1
+					"Y" : -1
 				}
 			],
 			"CapturedPoints" : 
@@ -53,41 +45,7 @@
 		{
 			"Time" : 0,
 			"Score" : 0,
-			"ActivePoints" : 
-			[
-				{
-					"X" : 1,
-					"Y" : 2
-				},
-				{
-					"X" : 1,
-					"Y" : 3
-				},
-				{
-					"X" : 0,
-					"Y" : 3
-				},
-				{
-					"X" : -1,
-					"Y" : 3
-				},
-				{
-					"X" : -1,
-					"Y" : 2
-				},
-				{
-					"X" : -1,
-					"Y" : 1
-				},
-				{
-					"X" : -1,
-					"Y" : 0
-				},
-				{
-					"X" : 0,
-					"Y" : 1
-				}
-			],
+			"ActivePoints" : [],
 			"CapturedPoints" : [],
 			"Regions" : 
 			[
@@ -131,6 +89,6 @@
 			]
 		},
 		"IsGameStarted" : false,
-		"CurrentMovingPlayer" : "Blue"
+		"CurrentMovingPlayer" : "Red"
 	}
 }

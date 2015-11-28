@@ -36,7 +36,7 @@
                     </Setter.Value>
                 </Setter>
                 <Style.Triggers>
-                    <Trigger Property="IsMouseOver"
+                    <!--<Trigger Property="IsMouseOver"
                              Value="True">
                         <Trigger.EnterActions>
                             <BeginStoryboard>
@@ -68,7 +68,7 @@
                                 </Storyboard>
                             </BeginStoryboard>
                         </Trigger.ExitActions>
-                    </Trigger>
+                    </Trigger>-->
                 </Style.Triggers>
             </Style>
         </Ellipse.Style>

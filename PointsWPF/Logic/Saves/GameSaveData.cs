@@ -11,36 +11,6 @@ namespace PointsOnline
             Blue
         }
 
-        public class Region
-        {
-            [Name("Points")]
-            List<IntPoint> _points;
-
-            public IReadOnlyCollection<IntPoint> Border { get { return _points.AsReadOnly(); } }
-
-            public Region()
-            {
-                _points = new List<IntPoint>();
-            }
-
-            public Region( IEnumerable<IntPoint> points ):
-                this()
-            {
-                _points.AddRange(points);
-                CheckRegion();
-            }
-
-            public void AddPoint(IntPoint p)
-            {
-                _points.Add(p);
-            }
-
-            private void CheckRegion()
-            {
-
-            }
-        }
-
         public class PlayerStats
         {
             [Name("Time")]
